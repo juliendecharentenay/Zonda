@@ -1,22 +1,19 @@
+import { Viewer } from '/jsm/viewer.js'
 
 var app = new Vue({
   el: '#app',
   data: {
-    simulation: {
-      name: "unnamed",
-      id: ""
-    },
-    domain: {
-      xMin: -10.0,
-      xMax:  10.0,
-      yMin: -10.0,
-      yMax:  10.0,
-      zMin: -10.0,
-      zMax:  10.0
-    },
     parameters: {
-      meshSize: 1.0,
-      timeStep: 1.0
+      name: "unnamed",
+      id: "",
+      x_min: -10.0,
+      x_max:  10.0,
+      y_min: -10.0,
+      y_max:  10.0,
+      z_min: -10.0,
+      z_max:  10.0,
+      mesh_size: 1.0,
+      time_step: 1.0
     },
     viewer: null
   },
@@ -27,6 +24,15 @@ var app = new Vue({
     this.viewer.animate();
   },
   methods: {
+    start_simulation: function() {
+      JdC.HttpRequest("/api/run_simulation", 
+           "POST", 
+           JSON.stringify(this.parameters), 
+           null,
+           (res) => {
+             console.log("Response to http request to /api/run_simulation: ", res);
+           });
+    }
   }
 });
 

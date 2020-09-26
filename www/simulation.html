@@ -14,7 +14,7 @@
     <vc-navbar></vc-navbar>
     <div style="display: block; position: absolute; width: 100vw; bottom: 56px;">
       <div style="display: block; position: fixed; top: 52px; bottom: 56px; left: 0; width: 20vw; overflow-y: scroll">
-            <b-collapse class="card" v-bind:open="true" animation="slide" aria-id="contentIdForGeneral">
+            <b-collapse class="card" v-bind:open="false" animation="slide" aria-id="contentIdForGeneral">
               <div slot="trigger" slot-scope="props" class="card-header" role="button" aria-controls="contentIdForGeneral">
                 <p class="card-header-title">
                     General
@@ -25,8 +25,8 @@
               </div>
               <div class="card-content">
                 <div class="content">
-                   <vc-input type="text" v-model="simulation.name" placeholder="Enter simulation name">Simulation Name</vc-input>
-                   <vc-input type="text" v-model="simulation.id" placeholder="Enter simulation ID">Simulation ID</vc-input>
+                   <vc-input type="text" v-model="parameters.name" placeholder="Enter simulation name">Simulation Name</vc-input>
+                   <vc-input type="text" v-model="parameters.id" placeholder="Enter simulation ID">Simulation ID</vc-input>
                 </div>
               </div>
             </b-collapse>
@@ -42,12 +42,12 @@
               </div>
               <div class="card-content">
                 <div class="content">
-                   <vc-input type="number" v-model="domain.xMin" placeholder="Enter minimum x value">X Minimum (m)</vc-input>
-                   <vc-input type="number" v-model="domain.xMax" placeholder="Enter maximum x value">X Maximum (m)</vc-input>
-                   <vc-input type="number" v-model="domain.yMin" placeholder="Enter minimum y value">Y Minimum (m)</vc-input>
-                   <vc-input type="number" v-model="domain.yMax" placeholder="Enter maximum y value">Y Maximum (m)</vc-input>
-                   <vc-input type="number" v-model="domain.zMin" placeholder="Enter minimum z value">Z Minimum (m)</vc-input>
-                   <vc-input type="number" v-model="domain.zMax" placeholder="Enter maximum z value">Z Maximum (m)</vc-input>
+                   <vc-input type="number" v-model="parameters.x_min" placeholder="Enter minimum x value">X Minimum (m)</vc-input>
+                   <vc-input type="number" v-model="parameters.x_max" placeholder="Enter maximum x value">X Maximum (m)</vc-input>
+                   <vc-input type="number" v-model="parameters.y_min" placeholder="Enter minimum y value">Y Minimum (m)</vc-input>
+                   <vc-input type="number" v-model="parameters.y_max" placeholder="Enter maximum y value">Y Maximum (m)</vc-input>
+                   <vc-input type="number" v-model="parameters.z_min" placeholder="Enter minimum z value">Z Minimum (m)</vc-input>
+                   <vc-input type="number" v-model="parameters.z_max" placeholder="Enter maximum z value">Z Maximum (m)</vc-input>
                 </div>
               </div>
             </b-collapse>
@@ -63,20 +63,20 @@
               </div>
               <div class="card-content">
                 <div class="content">
-                   <vc-input type="number" v-model="parameters.meshSize" placeholder="Enter mesh size">Mesh characteristic size (m)</vc-input>
-                   <vc-input type="number" v-model="parameters.timeStep" placeholder="Enter time step">Time step (s)</vc-input>
+                   <vc-input type="number" v-model="parameters.mesh_mize" placeholder="Enter mesh size">Mesh characteristic size (m)</vc-input>
+                   <vc-input type="number" v-model="parameters.time_step" placeholder="Enter time step">Time step (s)</vc-input>
                 </div>
               </div>
             </b-collapse>
 
             <div class="container has-text-centered pt-2"> <!-- style="padding-top: 1rem;" -->
-              <button class="button is-primary">Start simulation</button>
+              <button class="button is-primary" v-on:click="start_simulation()">Start simulation</button>
             </div>
 
       </div>
       <div style="display: block; position: fixed; top: 52px; bottom: 56px; left: 20vw; right: 0; overflow: hidden">
          <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0" id="threeJsContainer"></div>
-         <h1 class="title has-text-grey-light">Viewer for simulation {{ simulation.name }} ({{ simulation.id }}) will be here</h1>
+         <h1 class="title has-text-grey-light">Viewer for simulation {{ parameters.name }} ({{ parameters.id }}) will be here</h1>
       </div>
     </div>
     <div style="display: block; position: fixed; bottom: 0; left: 0; right: 0;">
@@ -87,12 +87,11 @@
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
   
-  <script src="/lib/three.js"></script>
+  <script src="/lib/httprequest.js"></script>
 
-  <script src="/js/viewer.js"></script>
   <script src="/vue-components/vc-navbar.js"></script>
   <script src="/vue-components/vc-footer.js"></script>
   <script src="/vue-components/vc-input.js"></script>
-  <script src="/js/vm-simulation.js"></script>
+  <script type="module" src="/js/vm-simulation.js"></script>
 </body>
 </html>

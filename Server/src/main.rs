@@ -1,9 +1,28 @@
 use actix_files as fs;
 use actix_files::NamedFile;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Result};
-use std::path::PathBuf;
+use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, Result};
+use std::path::{PathBuf};
+use std::env;
+use serde::{Serialize, Deserialize};
 
-#[get("/")]
+#[path = "simulation/parameters.rs"] mod parameters;
+
+#[derive(Serialize, Deserialize)]
+struct MyObj {
+  name: String,
+}
+
+
+#[post("/api/run_simulation")]
+async fn api_run_simulation(req_body: String) -> impl Responder {
+    println!("in api_run_simulation with body {}", req_body);
+    let p: parameters::Parameters = serde_json::from_str(&req_body).unwrap();
+    println!("Simulation name {} with id {}", p.name, p.id);
+    // HttpResponse::Ok().json(MyObj { name: parameters.name })
+    HttpResponse::Ok().json(p)
+}
+
+#[get("/hello")]
 async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
@@ -26,13 +45,15 @@ async fn index_html() -> Result<NamedFile> {
 async fn main() -> std::io::Result<()> {
     // println!("{}", fs::Files::new("/www", ".").show_files_listing());
     let port = 8080i32;
-    println!("Starting http server on port {}", port);
-    HttpServer::new(|| {
+    let www_directory = env::current_dir().unwrap().join("www");
+    println!("Starting http server on port {} serving files at {}.", port, www_directory.to_str().unwrap());
+    HttpServer::new(move || {
         App::new()
-            .service(fs::Files::new("/", "./www") // .show_files_listing()
+            .service(api_run_simulation)
+            // .service(hello)
+            .service(fs::Files::new("/", www_directory.as_path()) // .show_files_listing()
                          .index_file("index.html"))
             // .route("/", web::get().to(index_html))
-            // .service(hello)
             // .service(echo)
             // .route("/hey", web::get().to(manual_hello))
     })

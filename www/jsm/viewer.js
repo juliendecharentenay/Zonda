@@ -1,3 +1,7 @@
+import * as THREE from '/libm/threejs/three.module.js';
+import { TrackballControls } from '/libm/threejs/TrackballControls.js';
+
+
 class Viewer {
   constructor(containerId) {
     var container = document.getElementById(containerId);
@@ -11,6 +15,10 @@ class Viewer {
     this.camera.position.z = 5; // set(100, -400, 2000);
     this.scene.add(this.camera);
 
+    this.controls = new TrackballControls(this.camera, this.renderer.domElement);
+    // this.controls.minDistance = 200;
+    // this.controls.maxDistance = 500;
+
     this.geometry = new THREE.BoxGeometry();
     var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     this.cube = new THREE.Mesh(this.geometry, material);
@@ -19,6 +27,9 @@ class Viewer {
 
   animate() {
     requestAnimationFrame( this.animate.bind(this) );
+    this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
 }
+
+export { Viewer };
