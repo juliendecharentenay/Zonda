@@ -5,7 +5,8 @@ Vue.component('vc-input',
     },
     props: ['value', 
             'type',
-            'placeholder'],
+            'placeholder',
+             'disabled'],
     computed: {
       input: {
         get: function() { return this.value; },
@@ -19,7 +20,8 @@ Vue.component('vc-input',
       <input class="input is-small" 
              v-bind:type="type" 
              v-bind:placeholder="placeholder"
-             v-model="input">
+             v-model="input"
+             v-bind:disabled="disabled">
     </div>
   </div>
 </div>

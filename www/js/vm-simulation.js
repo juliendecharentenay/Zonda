@@ -4,6 +4,7 @@ var app = new Vue({
   el: '#app',
   data: {
     parameters: {
+      uuid: libUtils.uuidv4(),
       name: "unnamed",
       id: "",
       x_min: -10.0,

@@ -5,6 +5,7 @@ use std::path::{PathBuf};
 use std::env;
 use serde::{Serialize, Deserialize};
 
+#[path = "simulation/simulation.rs"] mod simulation;
 #[path = "simulation/parameters.rs"] mod parameters;
 
 #[derive(Serialize, Deserialize)]
@@ -12,6 +13,17 @@ struct MyObj {
   name: String,
 }
 
+#[post["/api/generate_mesh"]]
+async fn api_generate_mesh(req_body: String) -> impl Responder {
+    println!("in api_generate_mesh with body {}", req_body);
+    HttpResponse::Ok().body("Response from generate mesh!")
+}
+
+#[post["/api/get_mesh"]]
+async fn api_get_mesh(req_body: String) -> impl Responder {
+    println!("in api_get_mesh with body {}", req_body);
+    HttpResponse::Ok().body("Response from get mesh!")
+}
 
 #[post("/api/run_simulation")]
 async fn api_run_simulation(req_body: String) -> impl Responder {

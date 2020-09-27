@@ -25,8 +25,9 @@
               </div>
               <div class="card-content">
                 <div class="content">
+                   <vc-input type="text" v-model="parameters.id" placeholder="Enter simulation ID">Project ID</vc-input>
                    <vc-input type="text" v-model="parameters.name" placeholder="Enter simulation name">Simulation Name</vc-input>
-                   <vc-input type="text" v-model="parameters.id" placeholder="Enter simulation ID">Simulation ID</vc-input>
+                   <vc-input type="text" v-model="parameters.uuid" placeholder="Enter simulation name" v-bind:disabled="true">Simulation UUID</vc-input>
                 </div>
               </div>
             </b-collapse>
@@ -88,6 +89,7 @@
   <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
   
   <script src="/lib/httprequest.js"></script>
+  <script src="/lib/libutils.js"></script>
 
   <script src="/vue-components/vc-navbar.js"></script>
   <script src="/vue-components/vc-footer.js"></script>

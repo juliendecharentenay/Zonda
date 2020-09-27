@@ -2,6 +2,7 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Parameters {
+  pub uuid: String,
   pub name: String,
   pub id: String,
   pub x_min: f32,
