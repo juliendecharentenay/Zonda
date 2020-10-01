@@ -1,19 +1,37 @@
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 
-#[path = "point.rs"] mod point;
+const IJK: usize    = 0;
+const IPJK: usize   = 1;
+const IPJPK: usize  = 2;
+const IJPK: usize   = 3;
+const IJKP: usize   = 4;
+const IPJKP: usize  = 5;
+const IPJPKP: usize = 6;
+const IJPKP: usize  = 7;
 
-const CELL_IJK: i32    = 0;
-const CELL_IPJK: i32   = 1;
-const CELL_IPJPK: i32  = 2;
-const CELL_IJPK: i32   = 3;
-const CELL_IJKP: i32   = 4;
-const CELL_IPJKP: i32  = 5;
-const CELL_IPJPKP: i32 = 6;
-const CELL_IJPKP: i32  = 7;
+pub fn make_cell(ijk: &Uuid, ipjk: &Uuid, ipjpk: &Uuid, ijpk: &Uuid,
+              ijkp: &Uuid, ipjkp: &Uuid, ipjpkp: &Uuid, ijpkp: &Uuid) -> Cell {
+ Cell {
+   id: Uuid::new_v4(),
+   point_list: [*ijk, *ipjk, *ipjpk, *ijpk, *ijkp, *ipjkp, *ipjpkp, *ijpkp],
+   children_list: Vec::new(),
+ }
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct Cell {
-  point_index_list: [i64; 8],
-  children_index_list: Vec<i64>,
+  id: Uuid,
+  point_list: [Uuid; 8],
+  children_list: Vec<Uuid>,
+}
+
+impl Cell {
+  /*
+   * retrieve id
+   */
+  pub fn get_id(&self) -> &Uuid {
+    &self.id
+  }
 }
 

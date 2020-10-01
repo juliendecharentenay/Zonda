@@ -25,7 +25,7 @@
               </div>
               <div class="card-content">
                 <div class="content">
-                   <vc-input type="text" v-model="parameters.id" placeholder="Enter simulation ID">Project ID</vc-input>
+                   <vc-input type="text" v-model="parameters.project_id" placeholder="Enter simulation ID">Project ID</vc-input>
                    <vc-input type="text" v-model="parameters.name" placeholder="Enter simulation name">Simulation Name</vc-input>
                    <vc-input type="text" v-model="parameters.uuid" placeholder="Enter simulation name" v-bind:disabled="true">Simulation UUID</vc-input>
                 </div>
@@ -43,12 +43,52 @@
               </div>
               <div class="card-content">
                 <div class="content">
-                   <vc-input type="number" v-model="parameters.x_min" placeholder="Enter minimum x value">X Minimum (m)</vc-input>
-                   <vc-input type="number" v-model="parameters.x_max" placeholder="Enter maximum x value">X Maximum (m)</vc-input>
-                   <vc-input type="number" v-model="parameters.y_min" placeholder="Enter minimum y value">Y Minimum (m)</vc-input>
-                   <vc-input type="number" v-model="parameters.y_max" placeholder="Enter maximum y value">Y Maximum (m)</vc-input>
-                   <vc-input type="number" v-model="parameters.z_min" placeholder="Enter minimum z value">Z Minimum (m)</vc-input>
-                   <vc-input type="number" v-model="parameters.z_max" placeholder="Enter maximum z value">Z Maximum (m)</vc-input>
+                   <vc-input type="number" parse="float" v-model="parameters.mesh_mize" v-on:change="mark_change($event)" placeholder="Enter mesh size">Mesh characteristic size (m)</vc-input>
+                   <vc-input type="number" parse="float" v-model="parameters.x_center" v-on:change="mark_change($event)" placeholder="Enter center of computational domain, x-direction">X Center (m)</vc-input>
+                   <vc-input type="number" parse="int" v-model="parameters.x_n_points" v-on:change="mark_change($event)" placeholder="Enter number of points in the x direction">Number of points in x direction</vc-input>
+                   <vc-input type="number" parse="float" v-model="parameters.y_center" v-on:change="mark_change($event)" placeholder="Enter center of computational domain, y-direction">Y Center (m)</vc-input>
+                   <vc-input type="number" parse="int" v-model="parameters.y_n_points" v-on:change="mark_change($event)" placeholder="Enter number of points in the y direction">Number of points in y direction</vc-input>
+                   <vc-input type="number" parse="float" v-model="parameters.z_center" v-on:change="mark_change($event)" placeholder="Enter center of computational domain, y-direction">Z Center (m)</vc-input>
+                   <vc-input type="number" parse="int" v-model="parameters.z_n_points" v-on:change="mark_change($event)" placeholder="Enter number of points in the z direction">Number of points in z direction</vc-input>
+                </div>
+              </div>
+            </b-collapse>
+
+            <b-collapse class="card" v-bind:open="false" animation="slide" aria-id="contentIdForBoundaryConditions">
+              <div slot="trigger" slot-scope="props" class="card-header" role="button" aria-controls="contentIdForBoundaryConditions">
+                <p class="card-header-title">
+                    Boundary Conditions
+                </p>
+                <a class="card-header-icon">
+                    <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
+                </a>
+              </div>
+                              <!-- v-bind:selected="boundary.name == selected_boundary" -->
+              <div class="card-content">
+                <div class="content">
+                  <div class="select">
+                    <select v-model="selected_boundary_uuid">
+                      <option v-for="boundary in parameters.boundaries" 
+                              v-bind:value="boundary.uuid">
+                        {{ boundary.name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="select">
+                    <select v-model="boundary_type">
+                      <option v-for="bt in boundary_types">
+                        {{ bt }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <vc-input type="number" parse="float" v-model="boundary_vx" placeholder="Enter velocity in the x direction" v-if='boundary_type === "Inlet"'>X velocity (m/s)</vc-input>
+                  <vc-input type="number" parse="float" v-model="boundary_vy" placeholder="Enter velocity in the y direction" v-if='boundary_type === "Inlet"'>Y velocity (m/s)</vc-input>
+                  <vc-input type="number" parse="float" v-model="boundary_vz" placeholder="Enter velocity in the z direction" v-if='boundary_type === "Inlet"'>Z velocity (m/s)</vc-input>
+                  <vc-input type="number" parse="float" v-model="boundary_p" placeholder="Enter pressure" v-if='boundary_type === "Outlet"'>Pressure (Pa)</vc-input>
+                  <vc-input type="number" parse="float" v-model="boundary_t" placeholder="Enter temperature" v-if='boundary_type === "Inlet"'>Temperature (&deg;C)</vc-input>
+
                 </div>
               </div>
             </b-collapse>
@@ -64,8 +104,26 @@
               </div>
               <div class="card-content">
                 <div class="content">
-                   <vc-input type="number" v-model="parameters.mesh_mize" placeholder="Enter mesh size">Mesh characteristic size (m)</vc-input>
-                   <vc-input type="number" v-model="parameters.time_step" placeholder="Enter time step">Time step (s)</vc-input>
+                   <vc-input type="number" parse="float" v-model="parameters.time_step" placeholder="Enter time step">Time step (s)</vc-input>
+                   <vc-input type="number" parse="int" v-model="parameters.n_time_steps" placeholder="Enter the number of time step to simulate for">Number of time steps</vc-input>
+                </div>
+              </div>
+            </b-collapse>
+
+             <b-collapse class="card" v-bind:open="false" animation="slide" aria-id="contentIdForNormalisation">
+              <div slot="trigger" slot-scope="props" class="card-header" role="button" aria-controls="contentIdForNormalisation">
+                <p class="card-header-title">
+                    Normalisation factors
+                </p>
+                <a class="card-header-icon">
+                    <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
+                </a>
+              </div>
+              <div class="card-content">
+                <div class="content">
+                   <vc-input type="number" parse="float" v-model="parameters.norm_velocity" placeholder="Enter normalisation factor for velocity">Velocity normalisation (m/s)</vc-input>
+                   <vc-input type="number" parse="float" v-model="parameters.norm_density" placeholder="Enter normalisation factor for density">Density normalisation (kg/m3)</vc-input>
+                   <vc-input type="number" parse="float" v-model="parameters.norm_enthalpy" placeholder="Enter normalisation factor for enthalpy">Enthalpy (kJ/kg)</vc-input>
                 </div>
               </div>
             </b-collapse>

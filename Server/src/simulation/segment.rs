@@ -1,10 +1,11 @@
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 
 #[path = "point.rs"] mod point;
 
 #[derive(Serialize, Deserialize)]
 pub struct Segment {
-  start_point_index: i64,
-  end_point_index: i64,
+  start_point_id: Uuid,
+  end_point_id: Uuid,
 }
 

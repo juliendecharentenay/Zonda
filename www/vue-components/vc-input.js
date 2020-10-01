@@ -5,12 +5,24 @@ Vue.component('vc-input',
     },
     props: ['value', 
             'type',
+            'parse',
             'placeholder',
              'disabled'],
     computed: {
       input: {
         get: function() { return this.value; },
-        set: function(nV) { this.$emit('input', nV); }
+        set: function(nV) { 
+          switch (this.parse) {
+            case "float":
+              nV = parseFloat(nV);
+              break;
+            case "int":
+              nV = parseInt(nV);
+              break;
+          }
+          this.$emit('change', {from: this.value, to: nV});
+          this.$emit('input', nV); 
+        }
       }
     },
     template: `

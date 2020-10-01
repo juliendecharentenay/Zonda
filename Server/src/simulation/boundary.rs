@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 
 #[path = "point.rs"] mod point;
 
@@ -10,6 +11,6 @@ pub struct BoundaryParameters {
 #[derive(Serialize, Deserialize)]
 pub struct Boundary {
   parms: BoundaryParameters,
-  point_index_list: Vec<i64>,
+  point_index_list: Vec<Uuid>,
 }
 
