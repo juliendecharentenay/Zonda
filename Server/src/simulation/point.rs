@@ -12,10 +12,10 @@ pub const IJKP: usize = 5;
 pub struct Point {
   id: Uuid,
   neighbours: [Option<Uuid>; 6],
-  x: [f64; 3],
-  rho: f64,
-  u: [f64; 3],
-  t: f64,
+  pub x: [f64; 3],
+  pub rho: f64,
+  pub u: [f64; 3],
+  pub t: f64,
 }
 
 pub fn make_point(x: [f64; 3]) -> Point {

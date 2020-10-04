@@ -1,14 +1,14 @@
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-const IJK: usize    = 0;
-const IPJK: usize   = 1;
-const IPJPK: usize  = 2;
-const IJPK: usize   = 3;
-const IJKP: usize   = 4;
-const IPJKP: usize  = 5;
-const IPJPKP: usize = 6;
-const IJPKP: usize  = 7;
+pub const IJK: usize    = 0;
+pub const IPJK: usize   = 1;
+pub const IPJPK: usize  = 2;
+pub const IJPK: usize   = 3;
+pub const IJKP: usize   = 4;
+pub const IPJKP: usize  = 5;
+pub const IPJPKP: usize = 6;
+pub const IJPKP: usize  = 7;
 
 pub fn make_cell(ijk: &Uuid, ipjk: &Uuid, ipjpk: &Uuid, ijpk: &Uuid,
               ijkp: &Uuid, ipjkp: &Uuid, ipjpkp: &Uuid, ijpkp: &Uuid) -> Cell {
@@ -32,6 +32,20 @@ impl Cell {
    */
   pub fn get_id(&self) -> &Uuid {
     &self.id
+  }
+
+  /*
+   * Retrun whether a cell has children or not
+   */
+  pub fn has_children(&self) -> bool {
+    self.children_list.len() > 0
+  }
+
+  /*
+   * Get list of points
+   */
+  pub fn get_points(&self) -> &[Uuid] {
+    &self.point_list
   }
 }
 

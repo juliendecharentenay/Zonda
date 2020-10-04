@@ -23,7 +23,7 @@ var app = new Vue({
       boundaries: [
         { uuid: libUtils.uuidv4(),
           name: "Left",
-          type: "Inlet",
+          bctype: "Inlet",
           geometry: null,
           vx: 1.0,
           vy: 0.0,
@@ -32,7 +32,7 @@ var app = new Vue({
           t: 20.0 },
         { uuid: libUtils.uuidv4(),
           name: "Right",
-          type: "Outlet",
+          bctype: "Outlet",
           geometry: null,
           vx: 0.0,
           vy: 0.0,
@@ -41,7 +41,7 @@ var app = new Vue({
           t: 20.0 },
         { uuid: libUtils.uuidv4(),
           name: "Front",
-          type: "Symmetry",
+          bctype: "Symmetry",
           geometry: null,
           vx: 0.0,
           vy: 0.0,
@@ -50,7 +50,7 @@ var app = new Vue({
           t: 20.0 },
         { uuid: libUtils.uuidv4(),
           name: "Back",
-          type: "Symmetry",
+          bctype: "Symmetry",
           geometry: null,
           vx: 0.0,
           vy: 0.0,
@@ -59,7 +59,7 @@ var app = new Vue({
           t: 20.0 },
         { uuid: libUtils.uuidv4(),
           name: "Top",
-          type: "Symmetry",
+          bctype: "Symmetry",
           geometry: null,
           vx: 0.0,
           vy: 0.0,
@@ -68,7 +68,7 @@ var app = new Vue({
           t: 20.0 },
         { uuid: libUtils.uuidv4(),
           name: "Bottom",
-          type: "Symmetry",
+          bctype: "Symmetry",
           geometry: null,
           vx: 0.0,
           vy: 0.0,
@@ -82,8 +82,8 @@ var app = new Vue({
   },
   computed: {
     boundary_type: {
-      get: function() { return this.getSelectedBoundary().type; },
-      set: function(v) { this.getSelectedBoundary().type = v; }
+      get: function() { return this.getSelectedBoundary().bctype; },
+      set: function(v) { this.getSelectedBoundary().bctype = v; }
     },
     boundary_vx: {
       get: function() { return this.getSelectedBoundary().vx; },
