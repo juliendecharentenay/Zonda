@@ -3,6 +3,7 @@ use std::io::Write;
 use std::io::Read;
 use std::collections::HashMap;
 use uuid::Uuid;
+use std::error::Error;
 
 // #[path = "parameters.rs"] mod parameters;
 // #[path = "point.rs"] mod point;
@@ -10,117 +11,40 @@ use uuid::Uuid;
 // #[path = "cell.rs"] mod cell;
 // #[path = "segment.rs"] mod segment;
 
-mod parameters;
-mod point;
-mod boundary;
-mod cell;
-mod segment;
+pub mod parameters;
+use parameters::Parameters;
 
-pub fn make_default_simulation() -> Simulation {
-  let mut boundaries = Vec::new();
-  boundaries.push(parameters::BoundaryParameters {
-       uuid: "111".to_string(),
-       name: "Left".to_string(),
-       bctype: "Inlet".to_string(),
-       geometry: None,
-       vx: 1.0,
-       vy: 0.0,
-       vz: 0.0,
-       p: 0.0,
-       t: 20.0,
-  });
-  boundaries.push(parameters::BoundaryParameters {
-       uuid: "112".to_string(),
-       name: "Right".to_string(),
-       bctype: "Outlet".to_string(),
-       geometry: None,
-       vx: 1.0,
-       vy: 0.0,
-       vz: 0.0,
-       p: 0.0,
-       t: 20.0,
-  });
-  boundaries.push(parameters::BoundaryParameters {
-       uuid: "113".to_string(),
-       name: "Front".to_string(),
-       bctype: "Symmetry".to_string(),
-       geometry: None,
-       vx: 1.0,
-       vy: 0.0,
-       vz: 0.0,
-       p: 0.0,
-       t: 20.0,
-  });
-  boundaries.push(parameters::BoundaryParameters {
-       uuid: "114".to_string(),
-       name: "Back".to_string(),
-       bctype: "Symmetry".to_string(),
-       geometry: None,
-       vx: 1.0,
-       vy: 0.0,
-       vz: 0.0,
-       p: 0.0,
-       t: 20.0,
-  });
-  boundaries.push(parameters::BoundaryParameters {
-       uuid: "115".to_string(),
-       name: "Bottom".to_string(),
-       bctype: "Symmetry".to_string(),
-       geometry: None,
-       vx: 1.0,
-       vy: 0.0,
-       vz: 0.0,
-       p: 0.0,
-       t: 20.0,
-  });
-  boundaries.push(parameters::BoundaryParameters {
-       uuid: "116".to_string(),
-       name: "Top".to_string(),
-       bctype: "Symmetry".to_string(),
-       geometry: None,
-       vx: 1.0,
-       vy: 0.0,
-       vz: 0.0,
-       p: 0.0,
-       t: 20.0,
-  });
-  Simulation {
-    params: parameters::Parameters {
-      uuid: "default_simulation".to_string(),
-      name: "test".to_string(),
-      project_id: "test_project".to_string(),
-      x_center: 0.0,
-      y_center: 0.0,
-      z_center: 0.0,
-      x_n_points: 11,
-      y_n_points: 7,
-      z_n_points: 3,
-      mesh_size: 0.1,
-      time_step: 0.1,
-      n_time_steps: 2,
-      norm_velocity: 1.0,
-      norm_density: 1.0,
-      norm_enthalpy: 1.0,
-      boundaries: boundaries,
-    },
-    point_list: HashMap::new(),
-    solved_point_list: Vec::new(),
-    hanging_point_list: Vec::new(),
-    boundary_list: Vec::new(),
-    cell_list: HashMap::new(),
-    // segment_list: Vec::new(),
+use crate::mesh::Mesh;
+
+mod make;
+
+#[test]
+fn test_simulation_test1() {
+  let mut sim: Simulation = make_simulation_test1();
+  assert_eq!(sim.params.uuid, "default_simulation");
+  assert_eq!(sim.params.mesh_size, 0.1);
+  assert_eq!(sim.params.boundaries.len(), 6);
+
+  match sim.simulate() {
+    Err(e) => panic!("Simulation simulate failed with error {:?}", e),
+    _ => (),
   }
+
+  assert_eq!(sim.mesh.as_ref().unwrap().get_number_of_points(), 11*7*3);
+  assert_eq!(sim.mesh.as_ref().unwrap().get_number_of_cells(), 10*6*2);
+  assert_eq!(sim.mesh.as_ref().unwrap().get_number_of_solved_points(), 9*5*1);
+  assert_eq!(sim.mesh.as_ref().unwrap().get_number_of_hanging_points(), 8 + 4*(9+5+1));
+
+}
+
+pub fn make_simulation_test1() -> Simulation {
+  Simulation::new(make::parameters_test1())
 }
 
 pub fn make_simulation(params: parameters::Parameters) -> Simulation {
   Simulation {
     params,
-    point_list: HashMap::new(),
-    solved_point_list: Vec::new(),
-    hanging_point_list: Vec::new(),
-    boundary_list: Vec::new(),
-    cell_list: HashMap::new(),
-    // segment_list: Vec::new(),
+    mesh: None,
   }
 }
 
@@ -135,21 +59,27 @@ pub fn read_simulation(f:&mut std::fs::File) -> Simulation {
  */
 #[derive(Serialize, Deserialize)]
 pub struct Simulation {
-  params: parameters::Parameters,
-  point_list: HashMap<Uuid, point::Point>,
-  solved_point_list: Vec<Uuid>,
-  hanging_point_list: Vec<Uuid>,
-  boundary_list: Vec<boundary::Boundary>,
-  cell_list: HashMap<Uuid, cell::Cell>,
-  // segment_list: Vec<segment::Segment>,
+  pub params: Parameters,
+  pub mesh: Option<Mesh>,
 }
 
 impl Simulation {
+  /**
+   * Constructor
+   */
+  pub fn new(params: parameters::Parameters) -> Simulation {
+    Simulation {
+      params,
+      mesh: None,
+    }
+  }
+
   /**
    * Print some info
    */
   pub fn print_info(&self) {
     println!("Simulation {}/project {} has uuid {}", &self.params.name, &self.params.project_id, &self.params.uuid);
+/*
     println!("Number of points: {}", &self.point_list.len());
     println!("   - mesh statistic:");
     println!("   - number of solved points:  {}", self.solved_point_list.len());
@@ -158,6 +88,7 @@ impl Simulation {
       let p = self.params.boundaries.iter().find(|&bp| bp.uuid == b.parameters_uuid).unwrap();
       println!("   - number of points in boundary {}: {}", p.name, b.point_list.len());
     }
+*/
   }
 
   /**
@@ -175,14 +106,36 @@ impl Simulation {
   }
 
   /**
-   * Initialise the simulation:
-   *     Create the mesh point and cells from the input parameters
-   *     Populate simulation related parameters:
-   *       - assign solved point;
-   *       - assign boundary condition parameters and points [for edges];
+   * Run simulation
    */
-  pub fn initialize(&mut self) {
-    println!("Simulation::make_mesh - start");
+  pub fn simulate(&mut self) -> Result<(), Box<dyn Error>> {
+    self.initialize()?;
+/*
+    println!("Starting simulation");
+    let mut time = 0f64;
+    for iteration in 0..self.params.n_time_steps {
+      time += self.params.time_step;
+      let residual = solver::solve_temperature_conduction_equation(self.params.time_step, self);
+      println!(" Iteration {} - time {}s: {:.6}", iteration, time, residual);
+    }
+*/
+    Ok(())
+  }
+
+  /**
+   * Initialise the simulation:
+   */
+  pub fn initialize(&mut self) -> Result<(), Box<dyn Error>> {
+    println!("Initialise simulation");
+    if self.mesh.is_none() {
+       self.mesh = Some(Mesh::new());
+       self.mesh.as_mut().unwrap().initialize(self.params.x_center, self.params.y_center, self.params.z_center,
+                            self.params.x_n_points, self.params.y_n_points, self.params.z_n_points,
+                            self.params.mesh_size,
+                            &self.params.boundaries);
+       self.mesh.as_ref().unwrap().print_info();
+    }
+/*
     let x_np = self.params.x_n_points;
     let y_np = self.params.y_n_points;
     let z_np = self.params.z_n_points;
@@ -327,19 +280,22 @@ impl Simulation {
 
 
     println!("Simulation::make_mesh - complete with {} points", self.point_list.len());
+*/
+    Ok(())
   }
 
   /**
    * Output simulation to object implementing Write trait
    */
-  pub fn output(&self, o:&mut std::fs::File) -> std::io::Result<()> {
+  pub fn output(&self, o:&mut std::fs::File) -> Result<(), Box<dyn Error>> {
     o.write_all(serde_json::to_string(&self).unwrap().as_bytes()).unwrap();
     Ok(())
   }
 
-  /**
+  /*
    * Output simulation to legacy VTK file format
    */
+/*
   pub fn to_legacy_vtk(&self, o:&mut std::fs::File) -> std::io::Result<()> {
     o.write(b"# vtk DataFile Version 2.0\n").ok();
     o.write(format!("{}\n", self.params.name).as_bytes()).ok();
@@ -408,6 +364,7 @@ impl Simulation {
 
     Ok(())
   }
+*/
 
 }
 

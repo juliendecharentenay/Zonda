@@ -10,26 +10,25 @@ pub const IJKP: usize = 5;
 
 #[derive(Serialize, Deserialize)]
 pub struct Point {
-  id: Uuid,
-  neighbours: [Option<Uuid>; 6],
+  pub id: Uuid,
+  pub index: usize,
+  pub neighbours: [Option<Uuid>; 6],
   pub x: [f64; 3],
-  pub rho: f64,
-  pub u: [f64; 3],
-  pub t: f64,
-}
-
-pub fn make_point(x: [f64; 3]) -> Point {
-  Point {
-    id: Uuid::new_v4(),
-    neighbours: [None; 6],
-    x,
-    rho: 1.20,
-    u: [0.0; 3],
-    t: 295.0
-  }
 }
 
 impl Point {
+  /**
+   * constructor
+   */
+  pub fn new(index: usize, x: [f64; 3]) -> Point {
+    Point {
+      id: Uuid::new_v4(),
+      index,
+      neighbours: [None; 6],
+      x,
+    }
+  }
+
   /*
    * retrieve id
    */
