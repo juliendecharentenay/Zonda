@@ -21,7 +21,7 @@ mod make;
 #[test]
 fn test_simulation_test1() {
   let mut sim: Simulation = make_simulation_test1();
-  assert_eq!(sim.params.uuid, "default_simulation");
+  assert_eq!(sim.params.uuid, "test1_uuid01234");
   assert_eq!(sim.params.mesh_size, 0.1);
   assert_eq!(sim.params.boundaries.len(), 6);
 

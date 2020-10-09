@@ -109,8 +109,13 @@ impl Mesh {
    */
   pub fn get_range(&self) -> ([f64; 3], [f64; 3]) {
     let mut ptl: Vec<&Point> = self.point_list.values().collect();
-    ptl.sort_by(|a, b| a.index.cmp(&b.index));
-    (ptl.first().unwrap().x.clone(), ptl.last().unwrap().x.clone())
+    let mut xmin = [0f64; 3]; let mut xmax = [0f64; 3];
+    for i in 0..3 {
+      ptl.sort_by(|a, b| a.x[i].partial_cmp(&b.x[i]).unwrap());
+      xmin[i] = ptl.first().unwrap().x[i];
+      xmax[i] = ptl.last().unwrap().x[i];
+    }
+    (xmin, xmax)
   }
 
  /**
