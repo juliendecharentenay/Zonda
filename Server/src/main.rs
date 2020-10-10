@@ -11,6 +11,7 @@ mod simulation;
 use simulation::Simulation;
 mod mesh;
 mod utilities;
+mod physicsmodel;
 
 fn get_file_path(filename:& String) -> PathBuf {
     env::current_dir().unwrap().join("..").join("store").join(filename)

@@ -5,16 +5,11 @@ use std::collections::HashMap;
 use uuid::Uuid;
 use std::error::Error;
 
-// #[path = "parameters.rs"] mod parameters;
-// #[path = "point.rs"] mod point;
-// #[path = "boundary.rs"] mod boundary;
-// #[path = "cell.rs"] mod cell;
-// #[path = "segment.rs"] mod segment;
-
 pub mod parameters;
 use parameters::Parameters;
 
 use crate::mesh::Mesh;
+use crate::physicsmodel::PhysicsModel;
 
 mod make;
 
@@ -45,6 +40,7 @@ pub fn make_simulation(params: parameters::Parameters) -> Simulation {
   Simulation {
     params,
     mesh: None,
+    physics_model: None,
   }
 }
 
@@ -61,6 +57,7 @@ pub fn read_simulation(f:&mut std::fs::File) -> Simulation {
 pub struct Simulation {
   pub params: Parameters,
   pub mesh: Option<Mesh>,
+  pub physics_model: Option<PhysicsModel>,
 }
 
 impl Simulation {
@@ -71,6 +68,7 @@ impl Simulation {
     Simulation {
       params,
       mesh: None,
+      physics_model: None,
     }
   }
 
@@ -134,6 +132,11 @@ impl Simulation {
                             self.params.mesh_size,
                             &self.params.boundaries);
        self.mesh.as_ref().unwrap().print_info();
+    }
+
+    if self.physics_model.is_none() {
+      self.physics_model = Some(PhysicsModel::new());
+      self.physics_model.as_mut().unwrap().initialize(self.mesh.as_ref().unwrap());
     }
 /*
     let x_np = self.params.x_n_points;

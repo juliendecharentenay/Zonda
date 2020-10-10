@@ -104,6 +104,13 @@ impl Mesh {
   }
 
   /**
+   * Loop through each point
+   */
+  pub fn each_point<F: FnMut(&Uuid, &Point)>(&self, mut f: F) {
+    for (uuid, p) in self.point_list.iter() { f(&uuid, &p); }
+  }
+
+  /**
    * Get range: retrieve a tuple with 2 array representing the lower and 
    * upper x, y, z coordinates
    */
